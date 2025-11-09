@@ -1,0 +1,19 @@
+@startuml
+title Smart Home Context Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь системы smart_home")
+
+System(smarthome, "Умный дом", "Система упраления и контроля отопления")
+
+System_Ext(api_temp, "API датчиков температуры", "Внешнее API получения данных с датчика")
+System_Ext(api_warm, "API управления нагревателем", "Внешнее API управления исполнительным устройством (не реализовано)")
+
+Rel(user, smarthome, "Наблюдает за работой сиситемы и считывает данные датчиков")
+Rel(smarthome,api_temp,"Получает информацию о температуре")
+Rel(smarthome,api_warm,"Подает команды на выполнение (не реализовано)")
+
+@enduml

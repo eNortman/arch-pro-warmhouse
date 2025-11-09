@@ -1,0 +1,25 @@
+@startuml
+title SmartHome Web Application Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(WebApp, "Web Application", "Go", "Принимает и обрабатывает пользовательские запросы")
+  Container(Database, "Database", "PostgreSQL", "Stores data")
+}
+
+Container(WebApp, "Web Application", "Go") {
+  Component(ControllerLayer, "Sensor Controller", "Handles processing")
+  Component(ServiceLayer, "Sensor Service Layer", "Сервис обслуживания запросов")
+  Component(RepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+System_Ext(api_temp, "API датчиков температуры", "Внешнее API получения данных с датчика")
+
+Rel( ServiceLayer, api_temp, "Uses")
+Rel(ControllerLayer,ServiceLayer,"Uses")
+Rel(ServiceLayer,RepositoryLayer,"Uses")
+Rel(RepositoryLayer,Database,"Reads/Writes user data")
+@enduml

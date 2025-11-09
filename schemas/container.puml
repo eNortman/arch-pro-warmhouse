@@ -1,0 +1,21 @@
+@startuml
+title Smart Home Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь системы smart_home")
+System(smarthome, "Умный дом", "Система упраления и контроля отопления")
+
+Container_Boundary(smarthome, "Умный дом") {
+  Container(WebApp, "smart_home_web_app", "Go", "Принимает и обрабатывает пользовательские запросы")
+  Container(Database, "БД", "PostgreSQL", "Хранит информацию о зарегистрированных датчиках")
+}
+
+System_Ext(api_temp, "API датчиков температуры", "Внешнее API получения данных с датчика")
+
+Rel(user, WebApp, "Наблюдает за работой сиситемы и считывает данные датчиков")
+Rel(WebApp,Database,"Считывает/записывает данные о зарешистрированных датчиках")
+Rel(WebApp,api_temp,"Получает информацию о температуре запрошенного датчика")
+@enduml
