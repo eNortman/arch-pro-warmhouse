@@ -1,0 +1,354 @@
+openapi: 3.0.0
+info:
+  title: Smart Home Sensor API
+  version: 1.0.0
+  description: A collection for testing the Smart Home Sensor Management API
+servers:
+  - url: http://localhost:8080
+paths:
+  /health:
+    get:
+      summary: Health Check
+      tags: 
+       - health
+      responses: 
+       '200':
+          description: Successful operation
+      description: Check if the API is running
+  
+  /api/v3/sensors:
+    get:
+      summary: Get All Sensors
+      tags: 
+       - sensors
+      responses: 
+       '200':
+          description: Successful operation      
+      description: Retrieve all sensors
+    post:
+      summary: Create Sensor
+      tags: 
+       - sensors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sensor'       
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Create a new sensor
+  
+  /api/v3/sensors/{sensId}:
+    get:
+      summary: Get Sensor by ID
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of sensor
+          required: true
+          schema:
+            type: integer
+            format: int64
+      tags: 
+       - sensors
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Retrieve a specific sensor by ID
+    put:
+      summary: Update Sensor
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of sensor
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - sensors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sensor'          
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Update an existing sensor
+    delete:
+      summary: Delete Sensor
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of sensor
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - sensors
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Delete a sensor
+  
+  /api/v3/sensors/{sensId}/value:
+    patch:
+      summary: Update Sensor Value
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of sensor
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - sensors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorValue'           
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Update a sensor's value and status
+
+  /api/v3/actuators:
+    get:
+      summary: Get All Actuators
+      tags: 
+       - actuators
+      responses: 
+       '200':
+          description: Successful operation      
+      description: Retrieve all sensors
+    post:
+      summary: Create Sensor
+      tags: 
+       - actuators
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Create a new sensor
+  
+  /api/v3/actuators/{actId}:
+    get:
+      summary: Get actuator by ID
+      parameters:
+        - name: actId
+          in: path
+          description: ID of actuator
+          required: true
+          schema:
+            type: integer
+            format: int64
+      tags: 
+       - actuators
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Actuator'         
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Retrieve a specific sensor by ID
+    put:
+      summary: Update Actuator
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of sensor
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - actuators
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Actuator'         
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Update an existing actuators
+    delete:
+      summary: Delete actuator
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of actuator
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - actuators
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Delete a actuator
+  
+  /api/v3/actuators/{actId}/action:
+    post:
+      summary: Update Actuator Value
+      parameters:
+        - name: actId
+          in: path
+          description: ID of actuator
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActuatorAction'         
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Update a automation value / start action
+
+  /api/v3/automation:
+    get:
+      summary: Get all automation
+      tags: 
+       - automation
+      responses: 
+       '200':
+          description: Successful operation      
+      description: Retrieve all 
+    post:
+      summary: Create automation
+      tags: 
+       - automation
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Create a new automation
+  
+  /api/v3/automation/{actId}:
+    get:
+      summary: Get automation by ID
+      parameters:
+        - name: actId
+          in: path
+          description: ID of actuator
+          required: true
+          schema:
+            type: integer
+            format: int64
+      tags: 
+       - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Automation'         
+      responses: 
+       '200':
+          description: Successful operation     
+    put:
+      summary: Update automation
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of sensor
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Automation'         
+      responses: 
+       '200':
+          description: Successful operation     
+    delete:
+      summary: Delete automation
+      parameters:
+        - name: sensId
+          in: path
+          description: ID of actuator
+          required: true
+          schema:
+            type: integer
+            format: int64      
+      tags: 
+       - actuators
+      responses: 
+       '200':
+          description: Successful operation     
+      description: Delete a automation
+  
+
+
+components:
+  schemas:
+    Sensor:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Living Room Temperature
+        type:
+          type: string
+          example: Temperature         
+        location:
+          type: string
+          example: Living Room            
+        unit:
+          type: string
+          example: C
+    SensorValue:
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 22.2
+        status:
+          type: string
+          example: active         
+    Actuator:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Living Room Heater
+        type:
+          type: string
+          example: Heater            
+    ActuatorAction:
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 22.2
+        status:
+          type: boolean
+          example: true                    
+    Automation:
+      type: object
+      properties:
+        condition:
+          type: array
+        action:
+          type: array
+      
+
+    
+        
+        
