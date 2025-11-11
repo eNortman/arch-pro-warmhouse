@@ -1,25 +1,59 @@
 @startuml
-title SmartHome Web Application Component Diagram
+title SmartHome Component Diagram
 
 top to bottom direction
 
 !includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
 
-Container_Boundary(SmartHomeSystem, "SmartHome System") {
-  Container(WebApp, "Web Application", "Go", "Принимает и обрабатывает пользовательские запросы")
-  Container(Database, "Database", "PostgreSQL", "Stores data")
+LAYOUT_LANDSCAPE()
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/postgresql.puml
+
+Container_Boundary(SmartHomeSystem, "Умный дом") {
+  Container(WebApp, "webapp", "Go", "")
+  Container(Automation, "automation", "Go", "")
+  Container(DevCtrl, "dev_ctrl", "Go", "")
+  ContainerQueue(QBroker, "Queue broker", "ActiveMQ", "Queues and topics service")
+  ContainerDb(Database, "Database", "PostgreSQL", "Stores data", $sprite="postgresql")
 }
 
-Container(WebApp, "Web Application", "Go") {
-  Component(ControllerLayer, "Sensor Controller", "Handles processing")
-  Component(ServiceLayer, "Sensor Service Layer", "Сервис обслуживания запросов")
-  Component(RepositoryLayer, "Repository Layer", "Data access logic")
+
+Container(WebApp, "webapp", "Go") {
+  Component(WaControllerLayer,  "Http Controller", "Handles processing")
+  Component(WaServiceLayer,     "Sensor Service Layer", "Сервис обслуживания запросов")
+  Component(WaRepositoryLayer,  "Repository Layer", "Data access logic")
 }
 
-System_Ext(api_temp, "API датчиков температуры", "Внешнее API получения данных с датчика")
+Rel(WaControllerLayer, WaServiceLayer, "Uses")
+Rel(WaServiceLayer, WaRepositoryLayer, "Uses")
+Rel(WaRepositoryLayer,Database,"Reads/Writes data")
 
-Rel( ServiceLayer, api_temp, "Uses")
-Rel(ControllerLayer,ServiceLayer,"Uses")
-Rel(ServiceLayer,RepositoryLayer,"Uses")
-Rel(RepositoryLayer,Database,"Reads/Writes user data")
+Container(Automation, "automation", "Go") {
+  Component(AuServiceLayer, "Sensor Service Layer", "Сервис обслуживания запросов")
+  Component(AuRepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(AuServiceLayer,AuRepositoryLayer,"Uses")
+Rel(AuRepositoryLayer,Database,"Reads/Writes script data")
+Rel(AuServiceLayer, QBroker, "Uses")
+
+Container(DevCtrl, "dev_ctrl", "Go") {
+  Component(DcServiceLayer, "Sensor Service Layer", "Сервис обслуживания запросов")
+  Component(DcRepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(DcServiceLayer,DcRepositoryLayer,"Uses")
+Rel(DcRepositoryLayer,Database,"Reads/Writes sensor/actuators data and values")
+Rel(DcServiceLayer, QBroker, "Uses")
+
+System_Ext(api_temp, "API датчиков температуры", "Внешнее API получения данных с датчика  температуры")
+System_Ext(api_sens, "API generic датчиков", "Внешнее API получения данных с датчика")
+System_Ext(api_act, "API исполнительного устройства", "Внешнее API для приведения в исполнение устройства")
+
+
+Rel(DcServiceLayer, api_temp, "Uses")
+Rel(DcServiceLayer, api_sens, "Uses")
+Rel(DcServiceLayer, api_act, "Uses")
+
 @enduml

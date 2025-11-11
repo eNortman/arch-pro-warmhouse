@@ -3,19 +3,38 @@ title Smart Home Container Diagram
 
 top to bottom direction
 
-!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 Person(user, "Пользователь", "Пользователь системы smart_home")
-System(smarthome, "Умный дом", "Система упраления и контроля отопления")
+
 
 Container_Boundary(smarthome, "Умный дом") {
-  Container(WebApp, "smart_home_web_app", "Go", "Принимает и обрабатывает пользовательские запросы")
-  Container(Database, "БД", "PostgreSQL", "Хранит информацию о зарегистрированных датчиках")
+  Container(WebApp, "webapp", "Go", "Принимает и обрабатывает пользовательские запросы")
+  Container(Automation, "automation", "Go", "Выполняет задачи автоматизации")
+  
+  ContainerQueue(QBroker, "Очереди", "ActiveMQ", "Хранит сообщения для актуаторов и изменения от датчиков")
+
+  Container(api_int, "dev_ctrl", "Go", "Сервис интеграции с API устройств")
+
+  ContainerDb(Database, "БД", "PostgreSQL", "Хранит информацию о зарегистрированных устройствах, пользователя, сценариях")
 }
 
-System_Ext(api_temp, "API датчиков температуры", "Внешнее API получения данных с датчика")
 
-Rel(user, WebApp, "Наблюдает за работой сиситемы и считывает данные датчиков")
-Rel(WebApp,Database,"Считывает/записывает данные о зарешистрированных датчиках")
-Rel(WebApp,api_temp,"Получает информацию о температуре запрошенного датчика")
+Rel(user, WebApp, "Наблюдает за работой системы, считывает данные датчиков, производит настройку датчиков и средств автоматизации")
+
+Rel(api_int, QBroker,"Получает команды для актуаторов и публикует данные, полученные с датчиков")
+Rel(Automation, QBroker, "Следит за изменениями данных и отправляет в очередь команды для актуаторов по сценариям")
+
+System_Ext(api_temp, "API датчиков температуры", "Внешнее API получения данных с датчика  температуры")
+System_Ext(api_sens, "API generic датчиков", "Внешнее API получения данных с датчика")
+System_Ext(api_act, "API исполнительного устройства", "Внешнее API для приведения в исполнение устройства")
+
+Rel(api_int, api_sens, "Получает данные с внешнийх датчиков по их API")
+Rel(api_int, api_temp, "Получает данные с внешнийх датчиков по их API (пример для старого API)")
+Rel(api_int, api_act, "Отправляет команды на исполнительные у-ва по их API")
+
+Rel(WebApp, Database, "Производит настройку - регистрацию новых датчиков, управление пользователями, сценариями автоматизации")
+Rel(Automation, Database, "Читает настройки сценариев автоматизации")
+Rel(api_int, Database, "Читает список зарегистрированных устройств, записывает обновления состояни датчиков")
+
 @enduml
