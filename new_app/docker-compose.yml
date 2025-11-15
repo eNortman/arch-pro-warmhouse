@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: warmhouse-postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: smarthome
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - warmhouse-network
+
+  activemq:
+    image: apache/activemq-classic:5.17.7
+    container_name: warmhouse-activemq
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    environment:
+      - ACTIVEMQ_OPTS=-Djetty.host=0.0.0.0 -Djava.util.logging.config.file=logging.properties -Djava.security.auth.login.config=/opt/apache-activemq/conf/login.config
+    networks:
+      - warmhouse-network
+
+  temperature-oldapi:
+    build:
+      context: ./temperature-oldapi
+      dockerfile: Dockerfile
+    container_name: temperature-oldapi
+    ports:
+      - "8081:8081"
+    networks:
+      - warmhouse-network
+
+  automation:
+    build:
+      context: ./automation
+      dockerfile: Dockerfile
+    container_name: warmhouse-automation
+    depends_on:
+      postgres:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/warmhouse?user=postgres&password=postgres
+      - MSGBROKER_URL=tcp://activemq:61616
+    restart: unless-stopped
+    networks:
+      - warmhouse-network
+
+  devcontrol:
+    build:
+      context: ./devcontrol
+      dockerfile: Dockerfile
+    container_name: warmhouse-devcontrol
+    depends_on:
+      postgres:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+      temperature-oldapi:
+        condition: service_started
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/warmhouse?user=postgres&password=postgres
+      - MSGBROKER_URL=tcp://activemq:61616
+      - TEMPERATURE_API_URL=http://temperature-oldapi:8081
+    restart: unless-stopped
+    networks:
+      - warmhouse-network
+
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+    container_name: warmhouse-webapp
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/warmhouse?user=postgres&password=postgres
+    restart: unless-stopped
+    networks:
+      - warmhouse-network
+
+volumes:
+  postgres_data:
+
+networks:
+  warmhouse-network:
+    driver: bridge
+
