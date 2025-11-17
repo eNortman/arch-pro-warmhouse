@@ -1,0 +1,68 @@
+@startuml
+
+title SmartHome Component Diagram
+
+'top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+class SchedulerApp {
+  - MqClient mqttClient
+  - MessageHandler messageHandler
+  + start()
+}
+
+class MqClient {
+  - String brokerUrl
+  - String topic
+  - MessageHandler messageHandler
+  + connect()
+  + subscribe(String topic)
+  + onMessage(Message message)
+}
+
+class MessageHandler {
+  - List<ConditionActionPair> rules
+  + handleMessage(SensorValue value)
+}
+
+class ConditionActionPair {
+  - List<Condition> condition
+  - List<Action> action
+}
+
+interface Condition {
+  + boolean test(SensorValue value)
+}
+
+interface Action {
+  + execute(SensorValue value)
+}
+
+class ThresholdCondition {
+  - float64 expectedValue
+  - boolean expectedAbove
+  + boolean test(SensorValue value)
+}
+
+class LogAction {
+  
+  + execute(Message message)
+}
+
+class CommandAction {
+  - String command
+  + execute(SensorValue value)
+}
+
+SchedulerApp --> MqClient
+SchedulerApp --> MessageHandler
+MqClient --> MessageHandler : triggers
+MessageHandler --> ConditionActionPair : contain
+ConditionActionPair --> Condition
+ConditionActionPair --> Action
+Condition <|.. ThresholdCondition
+Action <|.. LogAction
+Action <|.. CommandAction
+
+@enduml

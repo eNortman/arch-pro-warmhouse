@@ -1,0 +1,68 @@
+asyncapi: 2.6.0
+
+info:
+  title: WarmHouse API
+  version: 1.0.0
+
+channels:
+  sensorInfoTopic:
+    publish:
+      message:
+        payload:
+          $ref: '#/components/schemas/sensormsg'
+  actuatorActionQueue:
+    publish:
+      message:
+        payload:
+          $ref: '#/components/schemas/actionmsg'
+
+
+
+components:
+  schemas:
+    sensormsg:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Уникальный идентификатор сообщения
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        sensorid:
+          type: integer
+          description: идентификатор датчика
+          example: 5
+        value:
+          type: integer
+          example: 22
+        status:
+          type: string
+          description: Статус 
+          example: "active"
+      required:
+        - id
+        - sensorid
+        - value
+        - status
+
+    actionmsg:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Уникальный идентификатор сообщения
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        devid:
+          type: integer
+          description: идентификатор актуатора
+          example: 5
+        value:
+          type: integer
+          description: задаваемое значение (например, температура)
+          example: 22
+        status:
+          type: boolean
+          description: задаваемое состояние (вкл/выкл)
+          example: true
+      required:
+        - id
+        - devid

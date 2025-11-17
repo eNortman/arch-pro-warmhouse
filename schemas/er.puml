@@ -1,0 +1,62 @@
+@startuml
+
+'skinparam linetype ortho
+
+entity "User" {
+  * id : NUMBER
+  --
+  username : VARCHAR
+}
+
+entity "ConditionPairs" {
+    * id : NUMBER
+    --
+    user_id : NUMBER
+    condition_id : NUMBER
+    last_updated: TIMESTAMP
+    created_at: TIMESTAMP    
+}
+
+User ||--o{ ConditionPairs
+
+entity "Sensors" {
+  * id : NUMBER
+  --
+  user_id : NUMBER
+  name : VARCHAR
+  type: VARCHAR
+  location: VARCHAR
+  value: FLOAT
+  unit: VARCHAR
+  status: VARCHAR
+  last_updated: TIMESTAMP
+  created_at: TIMESTAMP
+}
+
+entity "Actuators" {
+  * id : NUMBER
+  --
+  user_id : NUMBER
+  name : VARCHAR
+  type: VARCHAR
+  location: VARCHAR
+  status: VARCHAR
+  last_updated: TIMESTAMP
+  created_at: TIMESTAMP
+}
+
+entity "Condition" {
+    * id : NUMBER
+    --
+    user_id : NUMBER
+    sensor_id : NUMBER
+
+}
+
+Condition ||--o{ ConditionPairs
+Condition ||--o{ Sensors
+
+User ||--o{ Sensors
+User ||--o{ Actuators
+
+@enduml
