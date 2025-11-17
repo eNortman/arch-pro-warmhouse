@@ -1,5 +1,6 @@
 package warmhouse.webapp.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,8 @@ import warmhouse.webapp.repository.*;
 
 import java.util.List;
 
+@Tag(name = "Actuators API",
+        description = "API для регистрации сценариев автоматизации (реализован частично)")
 @RestController
 @RequestMapping("/api/v3/automation")
 class AutomationScriptsController {

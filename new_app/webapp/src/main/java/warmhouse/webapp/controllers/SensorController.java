@@ -1,5 +1,7 @@
 package warmhouse.webapp.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +11,8 @@ import warmhouse.webapp.repository.UserRepository;
 
 import java.util.List;
 
+@Tag(name = "Sensor API",
+        description = "API для управления данными о датчиках")
 @RestController
 @RequestMapping("/api/v3/sensor")
 class SensorController {
@@ -19,6 +23,9 @@ class SensorController {
     @Autowired
     public UserRepository userRepository;
 
+    @Operation(
+            summary = "Получить информацию о датчике по его ID"
+    )
     @GetMapping(value = "/{id}")
     public ResponseEntity<Sensor> getSensor(@PathVariable Long id){
 
@@ -27,6 +34,9 @@ class SensorController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @Operation(
+            summary = "Регистрация нового датчика"
+    )
     @PostMapping(value = "")
     public void registerSensor(@RequestBody SensorCreateJson sensorJson){
         var sensor = new Sensor(sensorJson.name, sensorJson.type, sensorJson.location, sensorJson.sensorSerialNumber);
@@ -39,6 +49,9 @@ class SensorController {
         sensorsRepository.save(sensor);
     }
 
+    @Operation(
+            summary = "Получть список всех датчиков пользователя с указанным userID"
+    )
     @GetMapping(value = "/byUserId/{id}")
     public List<Sensor> getAllSensorsByUserId(@PathVariable Long id){
         return sensorsRepository.getSensorsByUserId(id);

@@ -188,3 +188,6 @@ Locations - название комнаты, sensorId - идентификато
 В результате у вас должны быть созданы Dockerfiles и docker-compose для запуска микросервисов.
 
 [Результат](/new_app/docker-compose.yml) - в каталоге new_app
+
+[Автогенерация apidoc - http://webapp:8080/api-docs](http://localhost:8080/api-docs)
+[SwaggerUI - http://webapp:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
